@@ -1,0 +1,48 @@
+{
+  "version": 2,
+  "name": "fission",
+  "alias": "fission.now.sh",
+  "scope": "sankofa-systems",
+  "builds": [
+    {
+      "src": "*.js",
+      "use": "@now/node"
+    },
+    {
+      "src": "*.html",
+      "use": "@now/static"
+    },
+    {
+      "src": "*.png",
+      "use": "@now/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/",
+      "methods": [
+        "GET"
+      ],
+      "dest": "index.html"
+    },
+    {
+      "src": "social.png",
+      "dest": "fission.png"
+    },
+    {
+      "src": "/(?<verb>[^/]+)",
+      "methods": [
+        "POST"
+      ],
+      "dest": "/fission.js"
+    },
+    {
+      "src": "/(.*)",
+      "methods": [
+        "POST"
+      ],
+      "dest": "/?verb=$verb"
+    }
+  ],
+  "public": true
+}

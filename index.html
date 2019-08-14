@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <title>fission - Split secrets with ease</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta charset="utf-8">
+    <meta name="description"
+      content="Fission is a microservice that lets you split and recombine secrets using Shamir's Secret Sharing by making HTTP requests.">
+    <meta name="image" content="https://fission.now.sh/social.png">
+    <meta itemprop="name" content="fission - Split secrets with ease">
+    <meta itemprop="description"
+      content="Fission is a microservice that lets you split and recombine secrets using Shamir's Secret Sharing by making HTTP requests.">
+    <meta itemprop="image" content="https://fission.now.sh/social.png">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="fission - Split secrets with ease">
+    <meta name="twitter:description"
+      content="Fission is a microservice that lets you split and recombine secrets using Shamir's Secret Sharing by making HTTP requests.">
+    <meta name="twitter:creator" content="@aunyks">
+    <meta name="twitter:image:src" content="https://fission.now.sh/social.png">
+    <meta name="og:title" content="fission - Split secrets with ease">
+    <meta name="og:description"
+      content="Fission is a microservice that lets you split and recombine secrets using Shamir's Secret Sharing by making HTTP requests.">
+    <meta name="og:image" content="https://fission.now.sh/social.png">
+    <meta name="og:url" content="https://fission.now.sh/">
+    <meta name="og:site_name" content="fission - Split secrets with ease">
+    <meta name="og:locale" content="en_US">
+    <meta name="og:type" content="website">
+    <style>
+      html,
+      body {
+        font-family: sans-serif;
+        overflow-x: hidden;
+      }
+
+      body {
+        padding: 0 12.5vw;
+      }
+
+      #title,
+      #subtitle {
+        margin: 10px 0;
+      }
+
+      #subtitle {
+        margin: 0;
+        font-size: 1em;
+      }
+
+      a {
+        text-decoration: none;
+        border-bottom: 1px dotted #000;
+        color: black;
+      }
+
+      a:visited {
+        text-decoration: none;
+        border-bottom: 1px dotted #000;
+        color: darkslategray;
+      }
+
+      .legend {
+        margin: 2.5px 0;
+        font-size: 0.75em;
+      }
+
+      .endpoint {
+        background: #fbb;
+        padding: 5px 2px;
+      }
+
+      .request-blob {
+        border-left: 3px solid #eee;
+        box-shadow: -10px 0 0 #faf;
+      }
+
+      .response-blob {
+        border-left: 3px solid #eee;
+        box-shadow: -10px 0 0 #0e0;
+      }
+
+      pre {
+        border-radius: 10px;
+        padding: 10px 2.5px;
+        overflow-x: scroll;
+        background: #eee;
+      }
+
+      em {
+        font-style: normal;
+
+        color: teal;
+      }
+
+      footer {
+        margin: 40px 0;
+        font-size: 0.75em;
+      }
+
+    </style>
+  </head>
+
+  <body>
+    <h1 id="title">fission</h1>
+    <h2 id="subtitle">Split secrets with ease</h2>
+    <hr />
+    <p>
+      Fission is a microservice that lets you split and recombine secrets using <a
+        href="https://en.wikipedia.org/wiki/Shamir%27s_Secret_Sharing">Shamir's Secret Sharing</a>
+      by making HTTP requests.
+    </p>
+    <span class="legend">
+      <span style="color: #f0f;">&#x25cf;</span> Request
+    </span>
+    <span class="legend">
+      <span style="color: #0e0;">&#x25cf;</span> Response
+    </span>
+    <h3 class="endpoint">POST /split</h3>
+    <p class="request">
+      To split a secret into multiple shares, send a POST request to the <em>/split</em> endpoint with a JSON object of
+      the following
+      shape.
+      <pre class="request-blob">
+{
+  "secret": "0123456789abcdef",
+  "numThreshold": 2,
+  "numShares": 3
+}</pre>
+      Where <em>secret</em> is the hex encoded secret you'd like to split, <em>numThreshold</em> is the number of shares
+      needed to recover the secret again after being split, and <em>numShares</em> is the total number of shares to
+      create.
+      <br />
+      <br />
+      The number of shares cannot exceed 255, and the number of threshold shares cannot exceed the number of
+      total shares.
+    </p>
+    <p class="response">
+      If your request satisfies the above requirements, Fission will return a JSON response of the following shape.
+      <pre class="response-blob">
+{
+  "shares": [
+      "080108b1614bf97a0c704498515494bdbca4f4f9383a882e979aab67392cc2d7f9cc",
+      "0802107fc296eff418e0882da2a835676556f5c3703e0dbc33af4b67729799d6ef86",
+      "080318cea3dd168e1490ccb5f3fca1dad9f301d548c98539a4bce0674bfe5b22164b"
+  ]
+}</pre>
+      Where <em>shares</em> is an array of hex encoded shares of the original secret. These shares reveal
+      <i>nothing</i> about the original secret unless <em>numThreshold</em> shares are known.
+    </p>
+    <h3 class="endpoint">POST /join</h3>
+    <p class="request">
+      To recombine shares back into a secret, make a POST request to the <em>/join</em> endpoint with a JSON object of
+      the following shape.
+      <pre class="request-blob">
+{
+  "shares": [
+      "080108b1614bf97a0c704498515494bdbca4f4f9383a882e979aab67392cc2d7f9cc",
+      "0802107fc296eff418e0882da2a835676556f5c3703e0dbc33af4b67729799d6ef86"
+  ]
+}</pre>
+      Where <em>shares</em> is an array of hex encoded shares.
+    </p>
+    <p class="response">
+      If the threshold amount of shares are provided in the request and the shares were derived from the same secret,
+      Fission will return the original secret.
+      <pre class="response-blob">
+{
+  "secret": "0123456789abcdef"
+}</pre>
+      Where <em>secret</em> is the hex encoded secret. Note that Fission will attempt to recover a secret regardless of
+      the
+      number or type of shares provided in the request. It's your duty to ensure that the integrity of the secret is
+      kept.
+    </p>
+    <footer>
+      <p style="margin: 15px 0;">
+        This project depends on <a href="https://github.com/jwerle/shamirs-secret-sharing">Joseph Werle's Shamir's
+          Secret Sharing
+          Library</a>.
+      </p>
+      Copyright &copy; 2019 Sankofa Systems LLC
+    </footer>
+  </body>
+
+</html>
