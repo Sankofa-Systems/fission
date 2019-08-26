@@ -140,13 +140,16 @@
       <pre class="response-blob">
 {
   "shares": [
-      "080108b1614bf97a0c704498515494bdbca4f4f9383a882e979aab67392cc2d7f9cc",
-      "0802107fc296eff418e0882da2a835676556f5c3703e0dbc33af4b67729799d6ef86",
-      "080318cea3dd168e1490ccb5f3fca1dad9f301d548c98539a4bce0674bfe5b22164b"
-  ]
+      "080164bd7b7d74e6341a88e6636696fc7edd0428f2d1d7553f099565ceceab62fa40",
+      "0802c867f6fae8d168340dd1c6cc31e5fca4087cf9f5b34a7e943763814e4ba1e983",
+      "0803acda8d879c375c2e8537a5aaa71982780cbb0be964b44114a2614fc5e0e013c2"
+  ],
+  "checksum": "55c53f5d490297900cefa825d0c8e8e9532ee8a118abe7d8570762cd38be9818"
 }</pre>
       Where <em>shares</em> is an array of hex encoded shares of the original secret. These shares reveal
-      <i>nothing</i> about the original secret unless <em>numThreshold</em> shares are known.
+      <i>effectively nothing</i> about the original secret unless <em>numThreshold</em> shares are known. The
+      <em>checksum</em>
+      value is used later to determine the integrity of the secret.
     </p>
     <h3 class="endpoint">POST /join</h3>
     <p class="request">
@@ -155,24 +158,37 @@
       <pre class="request-blob">
 {
   "shares": [
-      "080108b1614bf97a0c704498515494bdbca4f4f9383a882e979aab67392cc2d7f9cc",
-      "0802107fc296eff418e0882da2a835676556f5c3703e0dbc33af4b67729799d6ef86"
-  ]
+      "080164bd7b7d74e6341a88e6636696fc7edd0428f2d1d7553f099565ceceab62fa40",
+      "0802c867f6fae8d168340dd1c6cc31e5fca4087cf9f5b34a7e943763814e4ba1e983"
+  ],
+  "checksum": "55c53f5d490297900cefa825d0c8e8e9532ee8a118abe7d8570762cd38be9818"
 }</pre>
-      Where <em>shares</em> is an array of hex encoded shares.
+      Where <em>shares</em> is an array of hex encoded shares, and <em>checksum</em> is an optional hex encoded checksum
+      of the
+      secret to be recovered.
     </p>
     <p class="response">
       If the threshold amount of shares are provided in the request and the shares were derived from the same secret,
-      Fission will return the original secret.
+      Fission will return the original secret. If <em>checksum</em> doesn't match that of the original secret, an error
+      response will be returned.
       <pre class="response-blob">
 {
   "secret": "0123456789abcdef"
 }</pre>
-      Where <em>secret</em> is the hex encoded secret. Note that Fission will attempt to recover a secret regardless of
+      Where <em>secret</em> is the hex encoded secret. Note that if <em>checksum</em> is absent from a request, Fission
+      will attempt to recover a secret regardless of
       the
       number or type of shares provided in the request. It's your duty to ensure that the integrity of the secret is
-      kept.
+      kept if that key is missing.
     </p>
+    <h4>Security Considerations</h4>
+    <p>
+      This service assumes that <a href="https://en.wikipedia.org/wiki/Transport_Layer_Security">TLS</a> protects
+      against <a href="https://en.wikipedia.org/wiki/Man-in-the-middle_attack">MITM</a> attacks. If this assumption
+      isn't aligned with your security
+      posture, do <i>NOT</i> use this service.
+    </p>
+    <p>Handle your secrets with care.</p>
     <footer>
       <a href="https://github.com/sankofa-systems/fission">GitHub</a>
       <p style="margin: 15px 0;">
