@@ -2,6 +2,15 @@
 <html>
 
   <head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-147191216-2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      gtag('js', new Date());
+
+      gtag('config', 'UA-147191216-2');
+    </script>
+
     <title>fission - Split secrets with ease</title>
     <link rel="icon" type="image/png" href="/favicon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
@@ -185,7 +194,7 @@
     <p>
       This service assumes that <a href="https://en.wikipedia.org/wiki/Transport_Layer_Security">TLS</a> protects
       against <a href="https://en.wikipedia.org/wiki/Man-in-the-middle_attack">MITM</a> attacks. If this assumption
-      isn't aligned with your security
+      isn't aligned with your risk
       posture, do <i>NOT</i> use this service.
     </p>
     <p>Handle your secrets with care.</p>

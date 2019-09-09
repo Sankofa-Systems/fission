@@ -43,6 +43,7 @@ const join = (req, res) => {
 }
 
 module.exports = (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*')
   try {
     switch (req.url) {
       case '/split':
